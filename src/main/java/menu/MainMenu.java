@@ -40,22 +40,39 @@ public class MainMenu {
                     boolean success = authService.register(username, email, password);
 
                     if (success) {
-                        System.out.println("Registration Successful!");
+                        System.out.println("\n✅ Registration Successful!");
                     } else {
-                        System.out.println("Registration Failed!");
+                        System.out.println("\n❌ Registration Failed!");
                     }
 
                     break;
 
                 case 2:
-                    System.out.println("Login Feature Coming Soon...");
+
+                    System.out.print("Enter Username: ");
+                    String loginUsername = scanner.nextLine();
+
+                    System.out.print("Enter Master Password: ");
+                    String loginPassword = scanner.nextLine();
+
+                    boolean login = authService.login(loginUsername, loginPassword);
+
+                    if (login) {
+                        System.out.println("\n✅ Login Successful!");
+                    } else {
+                        System.out.println("\n❌ Invalid Username or Password!");
+                    }
+
                     break;
 
                 case 3:
-                    System.out.println("Thank You!");
+
+                    System.out.println("Thank You for using Secure Password Vault!");
                     System.exit(0);
+                    break;
 
                 default:
+
                     System.out.println("Invalid Choice!");
             }
         }
