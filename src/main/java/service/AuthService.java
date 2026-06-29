@@ -7,7 +7,7 @@ public class AuthService {
 
     private UserDAO userDAO = new UserDAO();
 
-    // Register
+    // Register User
     public boolean register(String username, String email, String masterPassword) {
 
         User user = new User(username, email, masterPassword);
@@ -15,8 +15,8 @@ public class AuthService {
         return userDAO.registerUser(user);
     }
 
-    // Login
-    public boolean login(String username, String masterPassword) {
+    // Login User
+    public User login(String username, String masterPassword) {
 
         return userDAO.loginUser(username, masterPassword);
     }

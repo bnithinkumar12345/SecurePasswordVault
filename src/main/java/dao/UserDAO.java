@@ -25,7 +25,6 @@ public class UserDAO {
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
 
-            // Hash password before storing
             String hashedPassword = BCryptUtil.hashPassword(user.getMasterPassword());
             ps.setString(3, hashedPassword);
 
@@ -39,9 +38,9 @@ public class UserDAO {
     }
 
     // Login User
-    public boolean loginUser(String username, String password) {
+    public User loginUser(String username, String password) {
 
-        String sql = "SELECT master_password FROM users WHERE username = ?";
+        String sql = "SELECT * FROM users WHERE username = ?";
 
         try {
 
@@ -57,13 +56,22 @@ public class UserDAO {
 
                 String hashedPassword = rs.getString("master_password");
 
-                return BCryptUtil.checkPassword(password, hashedPassword);
+                if (BCryptUtil.checkPassword(password, hashedPassword)) {
+
+                    User user = new User();
+
+                    user.setId(rs.getInt("id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setEmail(rs.getString("email"));
+
+                    return user;
+                }
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        return false;
+        return null;
     }
 }

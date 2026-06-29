@@ -1,6 +1,7 @@
 package com.nithin.menu;
 
 import com.nithin.model.Credential;
+import com.nithin.model.User;
 import com.nithin.service.AuthService;
 import com.nithin.service.VaultService;
 
@@ -12,9 +13,6 @@ public class MainMenu {
     private Scanner scanner = new Scanner(System.in);
     private AuthService authService = new AuthService();
     private VaultService vaultService = new VaultService();
-
-    // Temporary user id
-    private int currentUserId = 1;
 
     public void start() {
 
@@ -44,10 +42,11 @@ public class MainMenu {
                     System.out.print("Enter Master Password: ");
                     String password = scanner.nextLine();
 
-                    if (authService.register(username, email, password))
+                    if (authService.register(username, email, password)) {
                         System.out.println("✅ Registration Successful!");
-                    else
+                    } else {
                         System.out.println("❌ Registration Failed!");
+                    }
 
                     break;
 
@@ -59,10 +58,14 @@ public class MainMenu {
                     System.out.print("Enter Master Password: ");
                     String loginPassword = scanner.nextLine();
 
-                    if (authService.login(loginUsername, loginPassword)) {
+                    User loggedInUser = authService.login(loginUsername, loginPassword);
 
-                        System.out.println("✅ Login Successful!");
-                        passwordVaultMenu();
+                    if (loggedInUser != null) {
+
+                        System.out.println("\n✅ Login Successful!");
+                        System.out.println("Welcome, " + loggedInUser.getUsername() + "!");
+
+                        passwordVaultMenu(loggedInUser);
 
                     } else {
 
@@ -83,7 +86,7 @@ public class MainMenu {
         }
     }
 
-    private void passwordVaultMenu() {
+    private void passwordVaultMenu(User loggedInUser) {
 
         while (true) {
 
@@ -115,19 +118,31 @@ public class MainMenu {
                     System.out.print("Notes: ");
                     String notes = scanner.nextLine();
 
-                    if (vaultService.addCredential(currentUserId, website, websiteUsername, password, notes))
+                    if (vaultService.addCredential(
+                            loggedInUser.getId(),
+                            website,
+                            websiteUsername,
+                            password,
+                            notes)) {
+
                         System.out.println("✅ Credential Added Successfully!");
-                    else
+
+                    } else {
+
                         System.out.println("❌ Failed to Add Credential!");
+                    }
 
                     break;
 
                 case 2:
 
-                    List<Credential> credentials = vaultService.getAllCredentials(currentUserId);
+                    List<Credential> credentials =
+                            vaultService.getAllCredentials(loggedInUser.getId());
 
                     if (credentials.isEmpty()) {
+
                         System.out.println("No Credentials Found!");
+
                     } else {
 
                         System.out.println("\n========== YOUR CREDENTIALS ==========");
@@ -139,7 +154,10 @@ public class MainMenu {
                             System.out.println("Username: " + c.getWebsiteUsername());
                             System.out.println("Password: " + c.getPassword());
                             System.out.println("Notes   : " + c.getNotes());
+
                         }
+
+                        System.out.println("--------------------------------");
                     }
 
                     break;
@@ -149,7 +167,10 @@ public class MainMenu {
                     System.out.print("Enter Website Name: ");
                     String searchWebsite = scanner.nextLine();
 
-                    Credential credential = vaultService.searchCredential(currentUserId, searchWebsite);
+                    Credential credential =
+                            vaultService.searchCredential(
+                                    loggedInUser.getId(),
+                                    searchWebsite);
 
                     if (credential != null) {
 
@@ -180,10 +201,19 @@ public class MainMenu {
                     System.out.print("New Notes: ");
                     String newNotes = scanner.nextLine();
 
-                    if (vaultService.updateCredential(currentUserId, updateWebsite, newUsername, newPassword, newNotes))
+                    if (vaultService.updateCredential(
+                            loggedInUser.getId(),
+                            updateWebsite,
+                            newUsername,
+                            newPassword,
+                            newNotes)) {
+
                         System.out.println("✅ Credential Updated Successfully!");
-                    else
+
+                    } else {
+
                         System.out.println("❌ Credential Update Failed!");
+                    }
 
                     break;
 
@@ -192,15 +222,22 @@ public class MainMenu {
                     System.out.print("Enter Website to Delete: ");
                     String deleteWebsite = scanner.nextLine();
 
-                    if (vaultService.deleteCredential(currentUserId, deleteWebsite))
+                    if (vaultService.deleteCredential(
+                            loggedInUser.getId(),
+                            deleteWebsite)) {
+
                         System.out.println("✅ Credential Deleted Successfully!");
-                    else
+
+                    } else {
+
                         System.out.println("❌ Credential Delete Failed!");
+                    }
 
                     break;
 
                 case 6:
 
+                    System.out.println("Logged Out Successfully!");
                     return;
 
                 default:
