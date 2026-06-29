@@ -2,6 +2,7 @@ package com.nithin.dao;
 
 import com.nithin.config.DBConnection;
 import com.nithin.model.Credential;
+import com.nithin.util.AESUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class CredentialDAO {
         String sql = "INSERT INTO credentials(user_id, website, website_username, encrypted_password, notes) VALUES (?, ?, ?, ?, ?)";
 
         try {
+
             Connection connection = DBConnection.getConnection();
 
             PreparedStatement ps = connection.prepareStatement(sql);
@@ -22,7 +24,11 @@ public class CredentialDAO {
             ps.setInt(1, credential.getUserId());
             ps.setString(2, credential.getWebsite());
             ps.setString(3, credential.getWebsiteUsername());
-            ps.setString(4, credential.getPassword());
+
+            // Encrypt Password
+            String encryptedPassword = AESUtil.encrypt(credential.getPassword());
+
+            ps.setString(4, encryptedPassword);
             ps.setString(5, credential.getNotes());
 
             return ps.executeUpdate() > 0;
@@ -59,11 +65,15 @@ public class CredentialDAO {
                 credential.setUserId(rs.getInt("user_id"));
                 credential.setWebsite(rs.getString("website"));
                 credential.setWebsiteUsername(rs.getString("website_username"));
-                credential.setPassword(rs.getString("encrypted_password"));
+
+                // Decrypt Password
+                credential.setPassword(
+                        AESUtil.decrypt(rs.getString("encrypted_password"))
+                );
+
                 credential.setNotes(rs.getString("notes"));
 
                 list.add(credential);
-
             }
 
         } catch (SQLException e) {
@@ -97,7 +107,12 @@ public class CredentialDAO {
                 credential.setUserId(rs.getInt("user_id"));
                 credential.setWebsite(rs.getString("website"));
                 credential.setWebsiteUsername(rs.getString("website_username"));
-                credential.setPassword(rs.getString("encrypted_password"));
+
+                // Decrypt Password
+                credential.setPassword(
+                        AESUtil.decrypt(rs.getString("encrypted_password"))
+                );
+
                 credential.setNotes(rs.getString("notes"));
 
                 return credential;
@@ -126,7 +141,10 @@ public class CredentialDAO {
             PreparedStatement ps = connection.prepareStatement(sql);
 
             ps.setString(1, newUsername);
-            ps.setString(2, newPassword);
+
+            // Encrypt Updated Password
+            ps.setString(2, AESUtil.encrypt(newPassword));
+
             ps.setString(3, newNotes);
             ps.setInt(4, userId);
             ps.setString(5, website);

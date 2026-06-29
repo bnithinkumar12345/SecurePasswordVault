@@ -2,6 +2,7 @@ package com.nithin.dao;
 
 import com.nithin.config.DBConnection;
 import com.nithin.model.User;
+import com.nithin.util.BCryptUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,11 +24,12 @@ public class UserDAO {
 
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getEmail());
-            ps.setString(3, user.getMasterPassword());
 
-            int rows = ps.executeUpdate();
+            // Hash password before storing
+            String hashedPassword = BCryptUtil.hashPassword(user.getMasterPassword());
+            ps.setString(3, hashedPassword);
 
-            return rows > 0;
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -37,9 +39,9 @@ public class UserDAO {
     }
 
     // Login User
-    public boolean loginUser(String username, String masterPassword) {
+    public boolean loginUser(String username, String password) {
 
-        String sql = "SELECT * FROM users WHERE username = ? AND master_password = ?";
+        String sql = "SELECT master_password FROM users WHERE username = ?";
 
         try {
 
@@ -48,11 +50,15 @@ public class UserDAO {
             PreparedStatement ps = connection.prepareStatement(sql);
 
             ps.setString(1, username);
-            ps.setString(2, masterPassword);
 
             ResultSet rs = ps.executeQuery();
 
-            return rs.next();
+            if (rs.next()) {
+
+                String hashedPassword = rs.getString("master_password");
+
+                return BCryptUtil.checkPassword(password, hashedPassword);
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
