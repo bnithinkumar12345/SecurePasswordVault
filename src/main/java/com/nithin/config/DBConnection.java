@@ -22,13 +22,9 @@ public class DBConnection {
 
         } catch (SQLException e) {
 
-            System.out.println("Database Connection Failed!");
-
             e.printStackTrace();
-
-            return null;
         }
 
+        return null;
     }
-
 }

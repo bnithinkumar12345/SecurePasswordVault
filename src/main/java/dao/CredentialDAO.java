@@ -1,4 +1,6 @@
-package dao;
+package com.nithin.dao;
 
 public class CredentialDAO {
 }
+
+
