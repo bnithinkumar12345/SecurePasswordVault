@@ -1,12 +1,13 @@
 package com.nithin;
 
-import com.nithin.config.DBConnection;
+import com.nithin.menu.MainMenu;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        DBConnection.getConnection();
+        MainMenu menu = new MainMenu();
+        menu.start();
 
     }
 }
