@@ -180,4 +180,31 @@ public class CredentialDAO {
 
         return false;
     }
+
+    // Get Total Credentials (Statistics)
+    public int getTotalCredentials(int userId) {
+
+        String sql = "SELECT COUNT(*) FROM credentials WHERE user_id=?";
+
+        try {
+
+            Connection connection = DBConnection.getConnection();
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+
+            ps.setInt(1, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
 }

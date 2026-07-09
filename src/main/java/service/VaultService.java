@@ -16,25 +16,26 @@ public class VaultService {
                                  String password,
                                  String notes) {
 
-        Credential credential = new Credential(
-                userId,
-                website,
-                websiteUsername,
-                password,
-                notes
-        );
+        Credential credential = new Credential();
+
+        credential.setUserId(userId);
+        credential.setWebsite(website);
+        credential.setWebsiteUsername(websiteUsername);
+        credential.setPassword(password);
+        credential.setNotes(notes);
 
         return credentialDAO.addCredential(credential);
     }
 
-    // View All Credentials
+    // View Credentials
     public List<Credential> getAllCredentials(int userId) {
 
         return credentialDAO.getAllCredentials(userId);
     }
 
     // Search Credential
-    public Credential searchCredential(int userId, String website) {
+    public Credential searchCredential(int userId,
+                                       String website) {
 
         return credentialDAO.searchCredential(userId, website);
     }
@@ -60,5 +61,11 @@ public class VaultService {
                                     String website) {
 
         return credentialDAO.deleteCredential(userId, website);
+    }
+
+    // Statistics
+    public int getTotalCredentials(int userId) {
+
+        return credentialDAO.getTotalCredentials(userId);
     }
 }
