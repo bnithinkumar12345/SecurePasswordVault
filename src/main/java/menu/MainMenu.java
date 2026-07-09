@@ -9,6 +9,7 @@ import com.nithin.util.PasswordStrengthChecker;
 import com.nithin.dao.LoginHistoryDAO;
 import com.nithin.model.LoginHistory;
 import com.nithin.dao.CredentialDAO;
+import com.nithin.util.ValidationUtil;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -141,7 +142,8 @@ public class MainMenu {
             System.out.println("8. View Login History");
             System.out.println("9. Change Master Password");
             System.out.println("10. Statistics");
-            System.out.println("11. Logout");
+            System.out.println("11. Export Credentials");
+            System.out.println("12. Logout");
             System.out.print("Enter your choice: ");
 
             int choice = scanner.nextInt();
@@ -151,14 +153,40 @@ public class MainMenu {
 
                 case 1:
 
+                    System.out.println("\n========== ADD CREDENTIAL ==========");
+
                     System.out.print("Website: ");
                     String website = scanner.nextLine();
+
+                    if (!ValidationUtil.isValidWebsite(website)) {
+
+                        System.out.println("❌ Website cannot be empty!");
+                        break;
+                    }
 
                     System.out.print("Website Username: ");
                     String websiteUsername = scanner.nextLine();
 
+                    if (!ValidationUtil.isValidUsername(websiteUsername)) {
+
+                        System.out.println("❌ Username cannot be empty!");
+                        break;
+                    }
+
                     System.out.print("Password: ");
                     String password = scanner.nextLine();
+
+                    if (!ValidationUtil.isValidPassword(password)) {
+
+                        System.out.println("❌ Password is too weak!");
+                        System.out.println("Password must contain:");
+                        System.out.println("- At least 8 characters");
+                        System.out.println("- One Uppercase Letter");
+                        System.out.println("- One Lowercase Letter");
+                        System.out.println("- One Number");
+                        System.out.println("- One Special Character");
+                        break;
+                    }
 
                     System.out.print("Notes: ");
                     String notes = scanner.nextLine();
@@ -383,6 +411,20 @@ public class MainMenu {
                     break;
 
                 case 11:
+
+                    if (vaultService.exportCredentials(loggedInUser.getId())) {
+
+                        System.out.println("\n✅ Credentials exported successfully!");
+                        System.out.println("File created: credentials.csv");
+
+                    } else {
+
+                        System.out.println("\n❌ Export Failed!");
+                    }
+
+                    break;
+
+                case 12:
 
                     System.out.println("Logged Out Successfully!");
                     return;

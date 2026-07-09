@@ -2,12 +2,13 @@ package com.nithin.service;
 
 import com.nithin.dao.CredentialDAO;
 import com.nithin.model.Credential;
+import com.nithin.util.ExportUtil;
 
 import java.util.List;
 
 public class VaultService {
 
-    private CredentialDAO credentialDAO = new CredentialDAO();
+    private final CredentialDAO credentialDAO = new CredentialDAO();
 
     // Add Credential
     public boolean addCredential(int userId,
@@ -37,7 +38,10 @@ public class VaultService {
     public Credential searchCredential(int userId,
                                        String website) {
 
-        return credentialDAO.searchCredential(userId, website);
+        return credentialDAO.searchCredential(
+                userId,
+                website
+        );
     }
 
     // Update Credential
@@ -60,12 +64,24 @@ public class VaultService {
     public boolean deleteCredential(int userId,
                                     String website) {
 
-        return credentialDAO.deleteCredential(userId, website);
+        return credentialDAO.deleteCredential(
+                userId,
+                website
+        );
     }
 
     // Statistics
     public int getTotalCredentials(int userId) {
 
         return credentialDAO.getTotalCredentials(userId);
+    }
+
+    // Export Credentials
+    public boolean exportCredentials(int userId) {
+
+        List<Credential> credentials =
+                credentialDAO.getAllCredentials(userId);
+
+        return ExportUtil.exportToCSV(credentials);
     }
 }

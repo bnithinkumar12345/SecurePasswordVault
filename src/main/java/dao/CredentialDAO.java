@@ -3,6 +3,7 @@ package com.nithin.dao;
 import com.nithin.config.DBConnection;
 import com.nithin.model.Credential;
 import com.nithin.util.AESUtil;
+import com.nithin.util.ErrorHandler;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -15,17 +16,13 @@ public class CredentialDAO {
 
         String sql = "INSERT INTO credentials(user_id, website, website_username, encrypted_password, notes) VALUES (?, ?, ?, ?, ?)";
 
-        try {
-
-            Connection connection = DBConnection.getConnection();
-
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, credential.getUserId());
             ps.setString(2, credential.getWebsite());
             ps.setString(3, credential.getWebsiteUsername());
 
-            // Encrypt Password
             String encryptedPassword = AESUtil.encrypt(credential.getPassword());
 
             ps.setString(4, encryptedPassword);
@@ -34,7 +31,8 @@ public class CredentialDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+
+            ErrorHandler.showDatabaseError(e);
         }
 
         return false;
@@ -47,37 +45,35 @@ public class CredentialDAO {
 
         String sql = "SELECT * FROM credentials WHERE user_id=?";
 
-        try {
-
-            Connection connection = DBConnection.getConnection();
-
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
 
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
+                while (rs.next()) {
 
-                Credential credential = new Credential();
+                    Credential credential = new Credential();
 
-                credential.setId(rs.getInt("id"));
-                credential.setUserId(rs.getInt("user_id"));
-                credential.setWebsite(rs.getString("website"));
-                credential.setWebsiteUsername(rs.getString("website_username"));
+                    credential.setId(rs.getInt("id"));
+                    credential.setUserId(rs.getInt("user_id"));
+                    credential.setWebsite(rs.getString("website"));
+                    credential.setWebsiteUsername(rs.getString("website_username"));
 
-                // Decrypt Password
-                credential.setPassword(
-                        AESUtil.decrypt(rs.getString("encrypted_password"))
-                );
+                    credential.setPassword(
+                            AESUtil.decrypt(rs.getString("encrypted_password"))
+                    );
 
-                credential.setNotes(rs.getString("notes"));
+                    credential.setNotes(rs.getString("notes"));
 
-                list.add(credential);
+                    list.add(credential);
+                }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+
+            ErrorHandler.showDatabaseError(e);
         }
 
         return list;
@@ -88,38 +84,36 @@ public class CredentialDAO {
 
         String sql = "SELECT * FROM credentials WHERE user_id=? AND website=?";
 
-        try {
-
-            Connection connection = DBConnection.getConnection();
-
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
             ps.setString(2, website);
 
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
 
-            if (rs.next()) {
+                if (rs.next()) {
 
-                Credential credential = new Credential();
+                    Credential credential = new Credential();
 
-                credential.setId(rs.getInt("id"));
-                credential.setUserId(rs.getInt("user_id"));
-                credential.setWebsite(rs.getString("website"));
-                credential.setWebsiteUsername(rs.getString("website_username"));
+                    credential.setId(rs.getInt("id"));
+                    credential.setUserId(rs.getInt("user_id"));
+                    credential.setWebsite(rs.getString("website"));
+                    credential.setWebsiteUsername(rs.getString("website_username"));
 
-                // Decrypt Password
-                credential.setPassword(
-                        AESUtil.decrypt(rs.getString("encrypted_password"))
-                );
+                    credential.setPassword(
+                            AESUtil.decrypt(rs.getString("encrypted_password"))
+                    );
 
-                credential.setNotes(rs.getString("notes"));
+                    credential.setNotes(rs.getString("notes"));
 
-                return credential;
+                    return credential;
+                }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+
+            ErrorHandler.showDatabaseError(e);
         }
 
         return null;
@@ -134,17 +128,11 @@ public class CredentialDAO {
 
         String sql = "UPDATE credentials SET website_username=?, encrypted_password=?, notes=? WHERE user_id=? AND website=?";
 
-        try {
-
-            Connection connection = DBConnection.getConnection();
-
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, newUsername);
-
-            // Encrypt Updated Password
             ps.setString(2, AESUtil.encrypt(newPassword));
-
             ps.setString(3, newNotes);
             ps.setInt(4, userId);
             ps.setString(5, website);
@@ -152,7 +140,8 @@ public class CredentialDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+
+            ErrorHandler.showDatabaseError(e);
         }
 
         return false;
@@ -163,11 +152,8 @@ public class CredentialDAO {
 
         String sql = "DELETE FROM credentials WHERE user_id=? AND website=?";
 
-        try {
-
-            Connection connection = DBConnection.getConnection();
-
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
             ps.setString(2, website);
@@ -175,34 +161,34 @@ public class CredentialDAO {
             return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+
+            ErrorHandler.showDatabaseError(e);
         }
 
         return false;
     }
 
-    // Get Total Credentials (Statistics)
+    // Get Total Credentials
     public int getTotalCredentials(int userId) {
 
         String sql = "SELECT COUNT(*) FROM credentials WHERE user_id=?";
 
-        try {
-
-            Connection connection = DBConnection.getConnection();
-
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = DBConnection.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setInt(1, userId);
 
-            ResultSet rs = ps.executeQuery();
+            try (ResultSet rs = ps.executeQuery()) {
 
-            if (rs.next()) {
+                if (rs.next()) {
 
-                return rs.getInt(1);
+                    return rs.getInt(1);
+                }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+
+            ErrorHandler.showDatabaseError(e);
         }
 
         return 0;

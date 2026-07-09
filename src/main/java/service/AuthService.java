@@ -6,11 +6,13 @@ import com.nithin.model.User;
 
 public class AuthService {
 
-    private UserDAO userDAO = new UserDAO();
-    private LoginHistoryDAO loginHistoryDAO = new LoginHistoryDAO();
+    private final UserDAO userDAO = new UserDAO();
+    private final LoginHistoryDAO loginHistoryDAO = new LoginHistoryDAO();
 
     // Register User
-    public boolean register(String username, String email, String masterPassword) {
+    public boolean register(String username,
+                            String email,
+                            String masterPassword) {
 
         User user = new User(username, email, masterPassword);
 
@@ -18,13 +20,17 @@ public class AuthService {
     }
 
     // Login User
-    public User login(String username, String masterPassword) {
+    public User login(String username,
+                      String masterPassword) {
 
         User user = userDAO.loginUser(username, masterPassword);
 
         if (user != null) {
 
-            loginHistoryDAO.saveLoginHistory(user.getId(), "SUCCESS");
+            loginHistoryDAO.saveLoginHistory(
+                    user.getId(),
+                    "SUCCESS"
+            );
         }
 
         return user;
@@ -35,7 +41,11 @@ public class AuthService {
                                   String email,
                                   String newPassword) {
 
-        return userDAO.resetPassword(username, email, newPassword);
+        return userDAO.resetPassword(
+                username,
+                email,
+                newPassword
+        );
     }
 
     // Change Master Password
