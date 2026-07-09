@@ -131,14 +131,28 @@ Main.java
 
 # 📸 Screenshots
 
-Add screenshots here after running the application.
 
-- Registration
-- Login
-- Password Vault
-- Statistics Dashboard
-- Login History
-- Export CSV
+
+## Home
+![Home](screenshots/home.png)
+
+## Registration & Login
+![Registration & Login](screenshots/registration-login.png)
+
+## Password Vault Menu
+![Vault Menu](screenshots/vault-menu.png)
+
+## Credentials
+![Credentials](screenshots/credentials.png)
+
+## Statistics Dashboard
+![Statistics](screenshots/statistics.png)
+
+## Login History
+![Login History](screenshots/login-history.png)
+
+## Export CSV
+![Export](screenshots/export.png)
 
 ---
 
